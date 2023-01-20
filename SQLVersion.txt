@@ -1,0 +1,104 @@
+SQL Fiddle
+
+-- Marcus Vescio, SQL program. 
+CREATE TABLE stocks (
+  symbol VARCHAR(5), -- Symbol with be a VarChar with a total of 5 characters seeing as stock symbols aren't more than 5 letters (assuming) this can always be changed if it is. 
+  buyselltype ENUM('B', 'S'), -- The values can only be buy or sell thus we use an enum with the values "B" for buy and "S" for sell
+  price decimal, -- Price will be instantiated as a double
+  qty INT -- Quantity
+);
+
+-- Insert the values into the table (importing a file with these files works as well)
+INSERT INTO stocks VALUES ('AAPL', 'B', 135.35, 200);
+INSERT INTO stocks VALUES ('AAPL', 'S', 139.23, 50);
+INSERT INTO stocks VALUES ('AAPL', 'B', 136.76, 75);
+INSERT INTO stocks VALUES ('AAPL', 'S', 137.45, 100);
+INSERT INTO stocks VALUES ('GOOG', 'S', 140.45, 150); -- Testing value to ensure it only displays AAPL stocks
+
+
+SELECT qty, price FROM stocks WHERE symbol = 'AAPL' && buyselltype = 'B' ORDER BY qty, price desc
+
+SELECT qty, price FROM stocks WHERE symbol = 'AAPL' && buyselltype = 'S' ORDER BY qty, price desc
+
+Using a union 
+
+SELECT qty, price 
+FROM stocks 
+WHERE symbol = 'AAPL' && buyselltype = 'B'
+UNION
+SELECT qty, price 
+FROM stocks 
+WHERE symbol = 'AAPL' && buyselltype = 'S'
+ORDER BY qty, price desc
+
+
+--
+
+SELECT sell.qty, sell.price, buy.qty, buy.price
+FROM
+(
+  SELECT qty, price
+  FROM stocks
+  WHERE symbol = 'AAPL' && buyselltype = 'B'
+  ORDER BY qty, price desc
+) AS buy
+FULL JOIN
+(
+  SELECT qty, price 
+  FROM stocks 
+  WHERE symbol = 'AAPL' && buyselltype = 'S'
+  ORDER BY qty, price desc
+) AS sell
+
+--
+testing
+
+SELECT q1.qty AS Quant1, q1.price AS Quant2, q2.qty AS Quant3, q2.price AS Quant4
+FROM stocks q1, stocks q2
+WHERE q1.symbol = 'AAPL' && q2.symbol == 'AAPL' && q1.buyselltype = 'S' && q2.buyselltype = 'B'
+ORDER BY q1.qty, q1.price desc, q2.qty, q2.price desc
+
+
+
+
+
+
+
+
+
+
+WORKING: 
+
+-- Marcus Vescio, SQL program. 
+CREATE TABLE stocks (
+  symbol VARCHAR(5), -- Symbol with be a VarChar with a total of 5 characters seeing as stock symbols aren't more than 5 letters (assuming) this can always be changed if it is. 
+  buyselltype ENUM('B', 'S'), -- The values can only be buy or sell thus we use an enum with the values "B" for buy and "S" for sell
+  price decimal, -- Price will be instantiated as a double
+  qty INT -- Quantity
+);
+
+-- Insert the values into the table (importing a file with these files works as well)
+INSERT INTO stocks VALUES ('AAPL', 'B', 135.35, 200);
+INSERT INTO stocks VALUES ('AAPL', 'S', 139.23, 50);
+INSERT INTO stocks VALUES ('AAPL', 'B', 136.76, 75);
+INSERT INTO stocks VALUES ('AAPL', 'S', 137.45, 100);
+INSERT INTO stocks VALUES ('GOOG', 'S', 140.45, 150); -- Testing value to ensure it only displays AAPL stocks
+
+SELECT qty AS "Sell Quantity", price AS "Sell Price" FROM stocks WHERE symbol = 'AAPL' && buyselltype = 'S' ORDER BY qty, price desc;
+SELECT qty AS "Buy Quantity", price AS "Buy Price" FROM stocks WHERE symbol = 'AAPL' && buyselltype = 'B' ORDER BY qty, price desc;
+
+SELECT qty, price 
+FROM stocks 
+WHERE symbol = 'AAPL' && buyselltype = 'B'
+UNION
+SELECT qty, price 
+FROM stocks 
+WHERE symbol = 'AAPL' && buyselltype = 'S'
+ORDER BY qty, price desc
+
+SELECT DISTINCT d1.qty AS SellQty, d1.price AS SellPrice, d2.qty AS BuyQty, d2.price AS BuyPrice
+FROM stocks d1
+JOIN stocks d2 ON d1.symbol = 'AAPL'
+WHERE
+d1.buyselltype = 'S' && d2.buyselltype = 'B' 
+ORDER BY d1.qty, d1.price desc, d2.qty, d2.price desc
